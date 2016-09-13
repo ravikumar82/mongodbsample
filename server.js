@@ -3,6 +3,7 @@ var app = express();
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
 var bodyParser = require('body-parser')
+var request = require("request");
 var url = 'mongodb://ravi:ravi123@ds021356.mlab.com:21356/ravitest';
 var db
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -30,8 +31,8 @@ function sendResponse(resp, code, msg) {
 	resp.end(JSON.stringify(oa));
 }
 
-function getRestaurants(req,res,id){
-	  var cursor =db.collection('restaurants').find({ "restaurant_id": id }).toArray(function(err, results) {
+function getProducts(req,res,id){
+	  var cursor =db.collection('products').find({ "product_id": id }).toArray(function(err, results) {
 	  //console.log(results);
 	  res.send(results)
 	  //db.close();
@@ -39,9 +40,33 @@ function getRestaurants(req,res,id){
    
 }
 
-function insertRestaurant(req,res){
+function getProductDesc(id){
+
+var product_desc;
+var customurl ='https://api.target.com/products/v3/'+id+'?fields=descriptions&id_type=TCIN&key=43cJWpLjH8Z8oR18KdrZDBKAgLLQKJjz'
+request({
+  uri: customurl,
+  method: "GET",
+  timeout: 10000
+}, function(error, result, body) {
+ // console.log(body);
+  var profile = JSON.parse(body);
+		//console.log('Response from target : ' + JSON.stringify(profile));
+		if (result.statusCode !== 200 ) {
+			
+			console.log('Http Status Code:' + result.statusCode);
+		} else {
+   product_desc = profile.product_composite_response.items[0].general_description;
+  console.log(product_desc);
+   
+}
+});
+
+}
+
+function insertProduct(req,res){
 	  
-	db.collection('restaurants').insertOne(req.body, (err, result) => {
+	db.collection('product').insertOne(req.body, (err, result) => {
 	    if (err) return console.log(err)
 
 	    console.log('saved to database')
@@ -85,16 +110,18 @@ app.get('/products', function(req, res) {
 	})
 })
 
-app.get('/restaurants/:id', function(req, res) {
+
+app.get('/products/:id', function(req, res) {
   
 	  var id = req.params.id;
 	  console.log(id);
-	  getRestaurants(req,res,id)
+	  //getProducts(req,res,id)
+	 var openhours= getProductDesc(id);
+	// console.log(openhours)
 	
 })
 
-
-app.post('/restaurant', (req, res) => {
+app.post('/product', (req, res) => {
   
 	if (!req.is('json')) {
 		res.jsonp(400, {
@@ -103,9 +130,10 @@ app.post('/restaurant', (req, res) => {
 		return;
 		}
 	
-	insertRestaurant(req,res);	
+	insertProduct(req,res);	
 
 })
+
 app.listen(3000, function() {
   console.log('listening on 3000')
 })

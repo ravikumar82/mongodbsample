@@ -1,0 +1,26 @@
+{
+  "name": "mongodbsample",
+  "version": "1.0.0",
+  "description": "sample poc for mongodb",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ravikumar82/.git"
+  },
+  "author": "ravi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ravikumar82/nodesamples/issues"
+  },
+  "homepage": "https://github.com/ravikumar82/nodesamples#readme",
+  "dependencies": {
+    "express": "^4.14.0",
+    "mongodb": "^2.2.9"
+  },
+  "devDependencies": {
+    "nodemon": "^1.10.2"
+  }
+}
