@@ -9,6 +9,7 @@ var url = 'mongodb://ravi:ravi123@ds021356.mlab.com:21356/ravitest';
 var db
 var product_desc;
 var resultsResp;
+
 app.use(bodyParser.urlencoded({
 	extended: false
 }))
@@ -86,6 +87,24 @@ function insertProduct(req, res) {
 
 }
 
+function updateProductByID(req, res,id) {
+
+    var product_id = req.body[0].product_id;
+
+    var setString = "East 31st Street";
+
+    console.log(product_id);
+
+	db.collection('product').updateOne({ 'product_id' : product_id},{ $set: { 'general_description': setString } },
+	 (err, result) => {
+		if (err) return console.log(err)
+
+		sendResponse(res, '200', 'Record saved successfully')
+			//db.close();
+	})
+
+}
+
 
 function formatresponse(resultsResp, product_desc) {
 
@@ -101,6 +120,15 @@ function formatresponse(resultsResp, product_desc) {
 
 }
 
+/*var updateRestaurants = function(db, callback) {
+   db.collection('restaurants').updateOne(
+      { "restaurant_id" : "41704622" },
+      { $set: { "address.street": "East 32st Street" } },
+      function(err, results) {
+        console.log(results);
+        callback();
+   });
+};*/
 MongoClient.connect(url, function(err, database) {
 	// assert.equal(null, err);
 	db = database
@@ -108,6 +136,12 @@ MongoClient.connect(url, function(err, database) {
 		//insertDocument(db, function() {
 		//   db.close();
 		// });
+
+ 		//updateRestaurants(db, function() {
+ 		//	console.log('inserted into database');
+      	//	db.close();
+ 		 //});
+
 });
 
 
@@ -183,6 +217,24 @@ app.post('/product', (req, res) => {
 	insertProduct(req, res);
 
 })
+
+app.put('/product/:id', (req, res) => {
+
+
+
+	if (!req.is('json')) {
+		res.jsonp(400, {
+			error: 'Bad request'
+		});
+		return;
+	}
+	var id = req.params.id;
+	console.log(id);
+
+	updateProductByID(req, res, id);
+
+})
+
 
 app.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function() {
 	//var addr = server.address();
